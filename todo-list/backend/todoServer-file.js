@@ -24,8 +24,12 @@ function removeAtIndex(arr, index) {
 }
 
 app.use(express.json());
+
 app.get('/todos', (req, res) => {
-  res.json(todos);
+  fs.readFile('todos.json', 'utf8', (err, data) => {
+    if (err) throw err;
+    res.json(JSON.parse(data));
+  });
 });
 
 app.post('/todos', (req, res) => {
@@ -34,8 +38,21 @@ app.post('/todos', (req, res) => {
     title: req.body.title,
     description: req.body.description,
   };
-  todos.push(newTodo);
-  res.status(200).json(newTodo);
+  console.log('newTodo', newTodo);
+
+  fs.readFile('todos.json', 'utf8', (err, data) => {
+    if (err) throw err;
+    const todos = JSON.parse(data);
+    console.log('todos', todos);
+    todos.push(newTodo);
+    console.log('after push todos', todos);
+    console.log('JSON.stringify(todos)', JSON.stringify(todos));
+    //note when we try to write, do not pass 'utf8', when we read it, we need 'utf8'
+    fs.writeFile('todos.json', JSON.stringify(todos), (err) => {
+      if (err) throw err;
+      res.status(201).json(newTodo);
+    });
+  });
 });
 
 app.put('/todos/:id', (req, res) => {
@@ -58,6 +75,6 @@ app.delete('/todos/:id', (req, res) => {
   }
 });
 
-app.listen('8000', () => {
-  console.log('server listening on 8000');
+app.listen('7000', () => {
+  console.log('server listening on 7000');
 });
