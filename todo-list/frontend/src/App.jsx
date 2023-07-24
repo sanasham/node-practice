@@ -43,7 +43,7 @@ function App() {
           </tr>
         </thead>
         <tbody>
-          {result?.map((rowvalue, i) => {
+          {result?.map((rowvalue) => {
             return (
               <tr key={rowvalue?.title}>
                 <td key={rowvalue?.id}>{rowvalue?.title}</td>
