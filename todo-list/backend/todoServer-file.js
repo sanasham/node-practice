@@ -1,5 +1,6 @@
 const express = require('express');
 const fs = require('fs');
+const cors = require('cors');
 
 const app = express();
 let todos = [];
@@ -24,6 +25,7 @@ function removeAtIndex(arr, index) {
 }
 
 app.use(express.json());
+app.use(cors());
 
 app.get('/todos', (req, res) => {
   fs.readFile('todos.json', 'utf8', (err, data) => {
