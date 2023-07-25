@@ -27,9 +27,12 @@ function App() {
       method: 'POST',
       body: JSON.stringify(todo),
       headers: { 'Content-Type': 'application/json' },
-    }).then((res) => console.log('success', res));
-    fetchData();
-    console.log('inputs', todo);
+    }).then(() => {
+      fetchData();
+      todo.title = '';
+      todo.description = '';
+      todo.id = '';
+    });
   };
   const tableItems = () => {
     return (
@@ -48,7 +51,12 @@ function App() {
               <tr key={rowvalue?.title}>
                 <td key={rowvalue?.id}>{rowvalue?.title}</td>
                 <td
-                  key={rowvalue?.description + rowvalue?.id + rowvalue?.title}
+                  key={
+                    rowvalue?.description +
+                    rowvalue?.id +
+                    'test' +
+                    rowvalue?.title
+                  }
                 >
                   {rowvalue?.description}
                 </td>
