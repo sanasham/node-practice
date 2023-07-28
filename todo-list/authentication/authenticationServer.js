@@ -35,7 +35,7 @@ const userAuthentication = (req, res, next) => {
   }
 };
 
-app.post('/admin/signup', (req, res, next) => {
+app.post('/admin/signup', (req, res) => {
   const { username, password } = req.body;
   const existingAdmin = ADMINS.find((a) => a.username === username);
   if (!existingAdmin) {
@@ -44,7 +44,6 @@ app.post('/admin/signup', (req, res, next) => {
   } else {
     res.status(403).json({ message: 'Admin already exists' });
   }
-  res.json({ message: 'Admin created successfully', token: 'jwt_token_here' });
 });
 
 app.post('/admin/login', adminAuthentication, (req, res, next) => {
@@ -84,14 +83,12 @@ app.get('/admin/courses', adminAuthentication, (req, res) => {
 app.post('/user/signup', (req, res) => {
   const user = { ...req.body, purchasedCourses: [] };
   const existingUser = USERS.find((a) => a.username === user.username);
-  console.log(existingUser);
   if (!existingUser) {
     USERS.push(user);
     res.json({ message: 'user created successfully', user: USERS });
   } else {
     res.status(403).json({ message: 'user already exists' });
   }
-  res.json({ message: 'Admin created successfully', token: 'jwt_token_here' });
 });
 
 app.post('/user/login', userAuthentication, (req, res) => {
@@ -100,6 +97,29 @@ app.post('/user/login', userAuthentication, (req, res) => {
 
 app.get('/user/courses', userAuthentication, (req, res) => {
   res.json({ courses: COURCES.filter((c) => c.published) });
+});
+
+app.get('/user/purchasedCourses', userAuthentication, (req, res) => {
+  const myPurchasedCourses = COURCES.filter((c) =>
+    req.user.purchasedCourses.includes(c.id)
+  );
+  res.json({ courses: myPurchasedCourses });
+});
+app.post('/user/courses/:id', userAuthentication, (req, res) => {
+  const courseId = parseInt(req.params.id);
+  console.log(courseId);
+  const checkPurchased = req.user.purchasedCourses.includes(courseId);
+  console.log('checkpurchased', checkPurchased);
+  if (checkPurchased) {
+    return res.json({ message: 'Course already purchased' });
+  }
+  const course = COURCES.find((a) => a.id === courseId && a.published);
+  if (course) {
+    req.user.purchasedCourses.push(courseId);
+    res.json({ message: 'Course purchased successfully' });
+  } else {
+    res.status(404).json({ message: 'course not fond or not available' });
+  }
 });
 
 app.listen(5000, () => {
