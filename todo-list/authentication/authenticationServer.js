@@ -20,6 +20,20 @@ const adminAuthentication = (req, res, next) => {
     next();
   }
 };
+const userAuthentication = (req, res, next) => {
+  const { username, password } = req.headers;
+
+  const user = USERS.find(
+    (a) => a.username === username && a.password === password
+  );
+
+  if (!user) {
+    res.status(403).json({ message: 'user Authentication failed' });
+  } else {
+    req.user = user;
+    next();
+  }
+};
 
 app.post('/admin/signup', (req, res, next) => {
   const { username, password } = req.body;
@@ -37,10 +51,9 @@ app.post('/admin/login', adminAuthentication, (req, res, next) => {
   res.json({ message: 'Logged in successfully', token: 'jwt_token_here' });
 });
 
-app.post('/admin/courses', adminAuthentication, (req, res, next) => {
+app.post('/admin/courses', adminAuthentication, (req, res) => {
   const course = req.body;
 
-  console.log('check_token', !course.title);
   if (course.title) {
     course.id = Date.now();
     COURCES.push(course);
@@ -50,7 +63,7 @@ app.post('/admin/courses', adminAuthentication, (req, res, next) => {
   }
 });
 
-app.put('/admin/courses:id', adminAuthentication, (req, res) => {
+app.put('/admin/courses/:id', adminAuthentication, (req, res) => {
   const courseId = Number(req.params.id);
   console.log(courseId);
   const course = COURCES.find((a) => a.id === courseId);
@@ -66,6 +79,27 @@ app.get('/admin/courses', adminAuthentication, (req, res) => {
   res.json({
     courses: COURCES,
   });
+});
+
+app.post('/user/signup', (req, res) => {
+  const user = { ...req.body, purchasedCourses: [] };
+  const existingUser = USERS.find((a) => a.username === user.username);
+  console.log(existingUser);
+  if (!existingUser) {
+    USERS.push(user);
+    res.json({ message: 'user created successfully', user: USERS });
+  } else {
+    res.status(403).json({ message: 'user already exists' });
+  }
+  res.json({ message: 'Admin created successfully', token: 'jwt_token_here' });
+});
+
+app.post('/user/login', userAuthentication, (req, res) => {
+  res.json({ message: 'user Logged in successfully', token: 'jwt_token_here' });
+});
+
+app.get('/user/courses', userAuthentication, (req, res) => {
+  res.json({ courses: COURCES.filter((c) => c.published) });
 });
 
 app.listen(5000, () => {
