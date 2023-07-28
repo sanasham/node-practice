@@ -9,12 +9,11 @@ let COURCES = [];
 
 const adminAuthentication = (req, res, next) => {
   const { username, password } = req.headers;
-  console.log('ADMINS', ADMINS);
-  console.log('username', username);
+
   const admin = ADMINS.find(
     (a) => a.username === username && a.password === password
   );
-  console.log(admin);
+
   if (!admin) {
     res.status(403).json({ message: 'Admin Authentication failed' });
   } else {
@@ -40,34 +39,32 @@ app.post('/admin/login', adminAuthentication, (req, res, next) => {
 
 app.post('/admin/courses', adminAuthentication, (req, res, next) => {
   const course = req.body;
-  console.log('course', course);
+
   console.log('check_token', !course.title);
   if (course.title) {
     course.id = Date.now();
     COURCES.push(course);
-    console.log('COURCES', COURCES);
     res.json({ message: 'Course created successfully', courseId: course.id });
   } else {
     res.status(403).json({ message: 'Course was not created' });
   }
 });
 
-app.put('/admin/courses:id', (req, res, next) => {
-  res.json({ message: 'Logged in successfully', token: 'jwt_token_here' });
+app.put('/admin/courses:id', adminAuthentication, (req, res) => {
+  const courseId = Number(req.params.id);
+  console.log(courseId);
+  const course = COURCES.find((a) => a.id === courseId);
+  if (course) {
+    Object.assign(course, req.body);
+    res.json({ message: 'Course updated successfully' });
+  } else {
+    res.status(404).json({ message: 'Course not fond' });
+  }
 });
 
-app.get('/admin/courses', (req, res, next) => {
+app.get('/admin/courses', adminAuthentication, (req, res) => {
   res.json({
-    courses: [
-      {
-        id: 1,
-        title: 'course title',
-        description: 'course description',
-        price: 100,
-        imageLink: 'https://linktoimage.com',
-        published: true,
-      },
-    ],
+    courses: COURCES,
   });
 });
 
