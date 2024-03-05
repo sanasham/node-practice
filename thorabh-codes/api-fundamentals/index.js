@@ -60,6 +60,26 @@ http
           }
         });
       });
+    } else if (req.method == "DELETE" && parsedUrl.pathname == "/products") {
+      console.log("entered in to delete product");
+      let id = parsedUrl.query.id;
+      let productArray = JSON.parse(customData);
+      let cusIndex = productArray.findIndex(
+        (product) => product.id === Number(id)
+      );
+      console.log("cusindex", cusIndex);
+      if (cusIndex !== -1) {
+        let finalProduct = productArray.splice(cusIndex, 1);
+        fs.writeFile("./product.json", JSON.stringify(finalProduct), (err) => {
+          if (err == null) {
+            res.end(
+              JSON.stringify({ message: "product deleted successfully" })
+            );
+          }
+        });
+      } else {
+        res.end(JSON.stringify({ message: "no product found" }));
+      }
     }
   })
   .listen(8000);
