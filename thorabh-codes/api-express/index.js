@@ -13,6 +13,37 @@ mongoose
     console.log("database connection error");
   });
 
+//user related information
+
+//schema for users
+
+const userSchema = mongoose.Schema(
+  {
+    username: {
+      type: String,
+      required: [true, "Name is mandatory"],
+    },
+    password: {
+      type: String,
+      required: [true, "Password is mandatory"],
+    },
+    email: {
+      type: String,
+      required: [true, "Email is mandatory"],
+    },
+  },
+  { timestamps: true }
+);
+
+// user model
+const userModel = mongoose.model("User", userSchema);
+
+// endpoints to create user
+
+app.post("/users", (req, res) => {});
+
+//Product related information
+
 //schema
 
 const productSchema = mongoose.Schema(
