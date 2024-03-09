@@ -8,6 +8,15 @@ class UserController {
       req.body;
 
     const user = await userModel.findOne({ email: email });
+
+    console.log(
+      "destructued vlaues",
+      name,
+      email,
+      password,
+      password_confirmation,
+      termCondition
+    );
     if (user) {
       res.send({ status: "failed", message: "email already exists" });
     } else if (
@@ -27,6 +36,9 @@ class UserController {
           termCondition: termCondition,
         });
         await doc.save();
+        res
+          .status(201)
+          .send({ status: "success", message: "Registration successfull" });
       } else {
         res.send({
           status: "failed",
