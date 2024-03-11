@@ -31,3 +31,5 @@ app.use("/api", router);
 app.listen(PORT || 3000, () =>
   console.log(`server is running on port number ${PORT}`)
 );
+
+//MONGODB_URL=mongodb+srv://admin:admin@cluster0.fv2y9wr.mongodb.net/sample?retryWrites=true&w=majority
